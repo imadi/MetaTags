@@ -4,6 +4,7 @@ import grails.converters.JSON
 
 class MetaTagController {
 
+	def grailsApplication
     def index() { 
 
     	render(view:"index", model:[:])
@@ -35,13 +36,18 @@ class MetaTagController {
 			
 			sentence = Summarize.getSentence(paragraph, hm);
 			if(sentence.trim().length()>0){
+				sentence = sentence.replaceAll("\\[.+?\\]","")
 				summary = summary + "\n" + sentence;
 			}
 			
 		}
 		log.info  "summary : " + summary
 		def keywords = []
-		def url = request.getServletContext().getResource("/WEB-INF/en-parser-chunking.bin")
+		//def url = request.getServletContext().getResource("/WEB-INF/left3words-wsj-0-18.tagger")
+		File file = grailsApplication.mainContext.getResource("left3words-wsj-0-18.tagger").file
+		//def url = "H:\\excel\\Mywork\\MetaTags\\web-app\\left3words-wsj-0-18.tagger"
+		def url = "C:\\Users\\fgts\\Documents\\workspace-ggts-3.6.4.RELEASE\\Mywork\\left3words-wsj-0-18.tagger"
+		log.info 'url : ' + url
 		summary.split("\n").each{
 			if(it.trim()!=""){
 				keywords << ParsingAPI.getKeyWords(it.replaceAll(',',''),url)

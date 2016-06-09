@@ -1,25 +1,28 @@
 package com.meta
 
-import opennlp.tools.cmdline.parser.ParserTool;
-import opennlp.tools.parser.Parse;
-import opennlp.tools.parser.Parser;
-import opennlp.tools.parser.ParserFactory;
-import opennlp.tools.parser.ParserModel;
-import opennlp.tools.chunker.ChunkerME
 import javax.servlet.ServletContext
+import edu.stanford.nlp.tagger.maxent.MaxentTagger
 
 
 
 class ParsingAPI {
 	
-	static Set nouns= []
-	static Set verbs= []
-	static Set adjs= []
-	
 	static def getKeyWords(sentence,url){
-	
-		InputStream modelIn = url.openStream()
-		
+		url = url.trim()
+		MaxentTagger tagger = new MaxentTagger(url);
+		String tagged = tagger.tagString("Python is a widely used high-level, general-purpose, interpreted, dynamic programming language.[22][23] Its design philosophy emphasizes code readability, and its syntax allows programmers to express concepts in fewer lines of code than would be possible in languages such as C++ or Java.[24][25] The language provides constructs intended to enable clear programs on both a small and large scale.[26]");
+		Set keywords = []
+
+		tagged.split(" ").each {
+
+			if(it.endsWith("/NNP") || it.endsWith("/NN") || it.endsWith("/NNPS")){
+				keywords<<it.substring(0,it.indexOf("/"))
+			}
+		}
+		println "keywords**" + keywords
+		return keywords
+		/*InputStream modelIn = url.openStream()
+		keywords = []
 		try {
 			ParserModel model = new ParserModel(modelIn)
 			Parser parser = ParserFactory.create(model)
@@ -40,24 +43,8 @@ class ParsingAPI {
 				}
 			}
 		}
-		return nouns
+		return nouns*/
 		
 	}
-	public static void getPhrases(Parse p) {
-		if (p.getType().equals("NN") || p.getType().equals("NNS") ||  p.getType().equals("NNP") || p.getType().equals("NNPS")) {
-			nouns.add(p.getCoveredText())
-		}
-
-		if (p.getType().equals("JJ") || p.getType().equals("JJR") || p.getType().equals("JJS")) {
-			adjs.add(p.getCoveredText())
-		}
-
-		if (p.getType().equals("VB") || p.getType().equals("VBP") || p.getType().equals("VBG")|| p.getType().equals("VBD") || p.getType().equals("VBN")) {
-			verbs.add(p.getCoveredText())
-		}
-
-		for (Parse child : p.getChildren()) {
-			getPhrases(child)
-		}
-	}
+	
 }
