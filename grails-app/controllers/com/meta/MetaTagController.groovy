@@ -57,7 +57,7 @@ class MetaTagController {
 		
 		keywords =  keywords.flatten().unique().join(',')
 		
-		log.info "keywords : " + keywords
+		println "keywords : " + keywords
 		def result = [summary:summary,keywords:keywords]
     	render result as JSON
     }
